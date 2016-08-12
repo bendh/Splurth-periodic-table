@@ -1,6 +1,6 @@
 package nl.benooms
 
-import nl.benooms.splurthperiodictable.PeriodicTableSymbolValidator
+import nl.benooms.splurthperiodictable.PeriodicTableService
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -19,7 +19,7 @@ class splurthperiodictableSpec extends Specification {
     @Unroll
     def "Given a symbol: #symbol and a element: #element a validation result: #expectedResult is returned" (symbol, element, expectedResult) {
         when:
-            def result = new PeriodicTableSymbolValidator().validateSymbol(symbol, element)
+            def result = new PeriodicTableService().validateSymbol(symbol, element)
         then:
             assert result == expectedResult
         where:
@@ -32,8 +32,14 @@ class splurthperiodictableSpec extends Specification {
             "AZ"    |   "e"               |   false //Length of element must be 2 or higher
             "ZN"    |   null              |   false //Length of element must be 2  or higher
             "12"    |   "abd"             |   false // only a-z A-Z allowed
-            "AB"    |   "YZ"              |   true
-            "AB"    |   "YZA"             |   true
+            "Ac"    |   "ab&"             |   false // only a-z A-Z allowed
+            "ac"    |   "Qbq"             |   false // should start with uppercase
+            "Ac"    |   "abq"             |   false // should start with uppercase
+            "Zc"    |   "abq"             |   false // first symbol char not in element
+            "Zc"    |   "Zbq"             |   false // second symbol char not in element
+            "AB"    |   "YZAB"            |   true
+            "AB"    |   "YZwAdfjkdvB"     |   true
+            "AB"    |   "AdfjkdvB"        |   true
     }
 
 }
